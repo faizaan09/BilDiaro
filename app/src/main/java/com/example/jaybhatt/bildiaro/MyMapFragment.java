@@ -1,6 +1,9 @@
 package com.example.jaybhatt.bildiaro;
 
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.BitmapFactory;
+import android.location.Geocoder;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
@@ -12,13 +15,17 @@ import android.view.ViewGroup;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-
+import com.google.android.gms.maps.*;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 //import com.google.android.gms.maps.OnMapReadyCallback;
 //import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import java.io.IOException;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -28,7 +35,10 @@ import com.google.android.gms.maps.model.MarkerOptions;
  * Use the {@link MyMapFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class MyMapFragment extends Fragment {
+public class MyMapFragment extends Fragment implements GoogleMap.OnInfoWindowClickListener,
+        GoogleMap.OnMapLongClickListener,
+        GoogleMap.OnMapClickListener,
+        GoogleMap.OnMarkerClickListener {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -51,6 +61,8 @@ public class MyMapFragment extends Fragment {
     private String mParam2;
 
     private OnFragmentInteractionListener mListener;
+
+
 
     public MyMapFragment() {
         // Required empty public constructor
@@ -109,12 +121,18 @@ public class MyMapFragment extends Fragment {
         if (mMap == null) {
             mMap = ((MapView) inflatedView.findViewById(R.id.map1)).getMap();
             if (mMap != null) {
-                //mMap.setOnMapClickListener();         declare the map event listeners here
+                mMap.setOnMapClickListener(this);         //declare the map event listeners here
+                mMap.setOnMarkerClickListener(this);
+                mMap.setOnInfoWindowClickListener(this);
+                mMap.setOnMapLongClickListener(this);
                 setUpMap();
 
             }
         }
+
     }
+
+
 
     private void setUpMap() {
         mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
@@ -140,6 +158,7 @@ public class MyMapFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        setUpMap();
         mMapView.onResume();
     }
 
@@ -153,6 +172,53 @@ public class MyMapFragment extends Fragment {
     public void onDestroy() {
         mMapView.onDestroy();
         super.onDestroy();
+    }
+
+    @Override
+    public void onInfoWindowClick(Marker marker) {
+
+    }
+
+    @Override
+    public void onMapClick(LatLng latLng) {
+
+    }
+
+    @Override
+    public void onMapLongClick(LatLng latLng) {
+        MarkerOptions options = new MarkerOptions().position( latLng );
+        options.title( "hello" );
+        
+        options.icon( BitmapDescriptorFactory.fromBitmap(
+                BitmapFactory.decodeResource(getResources(),
+                        R.mipmap.ic_launcher)) );
+
+        mMap.addMarker( options );
+    }
+
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        NewFragment nextFrag = new NewFragment();
+        this.getFragmentManager().beginTransaction()
+                .replace(R.id.frame_container, nextFrag, null)
+                .addToBackStack(null)
+                .commit();
+
+        return false;
+    }
+
+    private String getAddressFromLatLng( LatLng latLng ) {
+        Geocoder geocoder = new Geocoder( getActivity() );
+
+        String address = "";
+        try {
+            address = geocoder
+                    .getFromLocation( latLng.latitude, latLng.longitude, 1 )
+                    .get( 0 ).getAddressLine( 0 );
+        } catch (IOException e ) {
+        }
+
+        return address;
     }
 
     /**
@@ -169,4 +235,5 @@ public class MyMapFragment extends Fragment {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
+
 }
