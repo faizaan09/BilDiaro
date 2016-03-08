@@ -1,31 +1,30 @@
 package com.example.jaybhatt.bildiaro;
 
 import android.content.Context;
-import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Geocoder;
-import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.*;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
-//import com.google.android.gms.maps.OnMapReadyCallback;
-//import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -48,7 +47,7 @@ public class MyMapFragment extends Fragment implements GoogleMap.OnInfoWindowCli
 //    private Location mCurrentLocation;
     private MapView mMapView;
     private GoogleMap mMap;
-    private Bundle mBundle;
+    //private Bundle mBundle;
 
     private final int[] MAP_TYPES = { GoogleMap.MAP_TYPE_SATELLITE,
             GoogleMap.MAP_TYPE_NORMAL,
@@ -62,10 +61,12 @@ public class MyMapFragment extends Fragment implements GoogleMap.OnInfoWindowCli
 
     private OnFragmentInteractionListener mListener;
 
-
+    private ArrayList<MarkerOptions> markers;
+    private CameraPosition cp;
 
     public MyMapFragment() {
         // Required empty public constructor
+        markers = new ArrayList<MarkerOptions>();
     }
 
     /**
@@ -89,6 +90,7 @@ public class MyMapFragment extends Fragment implements GoogleMap.OnInfoWindowCli
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Toast.makeText(getActivity(), "Restored Your Instance", Toast.LENGTH_SHORT).show();
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
@@ -100,14 +102,15 @@ public class MyMapFragment extends Fragment implements GoogleMap.OnInfoWindowCli
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View inflatedView =  inflater.inflate(R.layout.fragment_my_map, container, false);
-
-        MapsInitializer.initialize(getActivity());
-
         mMapView = (MapView) inflatedView.findViewById(R.id.map1);
-        mMapView.onCreate(mBundle);
-        setUpMapIfNeeded(inflatedView);
-
         return inflatedView;
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        mMapView.onCreate(savedInstanceState);
+        setUpMapIfNeeded(getView());
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -121,6 +124,7 @@ public class MyMapFragment extends Fragment implements GoogleMap.OnInfoWindowCli
         if (mMap == null) {
             mMap = ((MapView) inflatedView.findViewById(R.id.map1)).getMap();
             if (mMap != null) {
+                MapsInitializer.initialize(getActivity());
                 mMap.setOnMapClickListener(this);         //declare the map event listeners here
                 mMap.setOnMarkerClickListener(this);
                 mMap.setOnInfoWindowClickListener(this);
@@ -135,8 +139,17 @@ public class MyMapFragment extends Fragment implements GoogleMap.OnInfoWindowCli
 
 
     private void setUpMap() {
-        mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
+
+        for (MarkerOptions marker: markers) {
+            mMap.addMarker(marker);
+        }
     }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putSerializable("markers", markers);
+      }
 
     @Override
     public void onAttach(Context context) {
@@ -158,14 +171,22 @@ public class MyMapFragment extends Fragment implements GoogleMap.OnInfoWindowCli
     @Override
     public void onResume() {
         super.onResume();
-        setUpMap();
+        setUpMapIfNeeded(getView());
         mMapView.onResume();
+        if(cp != null)
+        {
+            mMap.moveCamera(CameraUpdateFactory.newCameraPosition(cp));
+        }
+        Toast.makeText(getActivity(), "Onresume", Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onPause() {
         super.onPause();
         mMapView.onPause();
+        cp = mMap.getCameraPosition();
+        mMap = null;
+        Toast.makeText(getActivity(), "Onpause", Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -186,25 +207,36 @@ public class MyMapFragment extends Fragment implements GoogleMap.OnInfoWindowCli
 
     @Override
     public void onMapLongClick(LatLng latLng) {
-        MarkerOptions options = new MarkerOptions().position( latLng );
-        options.title( "hello" );
-        
-        options.icon( BitmapDescriptorFactory.fromBitmap(
-                BitmapFactory.decodeResource(getResources(),
-                        R.mipmap.ic_launcher)) );
+        MarkerOptions options = new MarkerOptions().position(latLng);
 
+        String path = Environment.getExternalStorageDirectory().getPath();
+        System.out.println(path);
+        String icon = path+"/DCIM/100ANDRO/DSC_0060.jpg";
+        options.title(icon);
+        options.icon(BitmapDescriptorFactory.fromBitmap(resizeMapIcons(icon, 100, 100)));
+        markers.add(options);
         mMap.addMarker( options );
     }
 
     @Override
     public boolean onMarkerClick(Marker marker) {
-        NewFragment nextFrag = new NewFragment();
+        PhotoDetailFragment nextFrag = new PhotoDetailFragment();
+        Bundle bundle = new Bundle();
+        bundle.putString("image", marker.getTitle());
+        nextFrag.setArguments(bundle);
         this.getFragmentManager().beginTransaction()
                 .replace(R.id.frame_container, nextFrag, null)
                 .addToBackStack(null)
                 .commit();
 
         return false;
+    }
+
+    public Bitmap resizeMapIcons(String icon, int width, int height)
+    {
+        Bitmap imageBitmap = BitmapFactory.decodeFile(icon);
+        Bitmap resizedBitmap = Bitmap.createScaledBitmap(imageBitmap, width, height, false);
+        return resizedBitmap;
     }
 
     private String getAddressFromLatLng( LatLng latLng ) {

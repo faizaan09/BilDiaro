@@ -1,9 +1,11 @@
 package com.example.jaybhatt.bildiaro;
 
+import android.app.Activity;
 import android.app.FragmentManager;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.app.Fragment;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -15,9 +17,15 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.gun0912.tedpicker.Config;
+import com.gun0912.tedpicker.ImagePickerActivity;
+
+import java.util.ArrayList;
+
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
+    private static final int INTENT_REQUEST_GET_IMAGES = 13;
     private Fragment fragment;
 
     @Override
@@ -31,8 +39,9 @@ public class MainActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                /*Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();*/
+                getImages();
             }
         });
 
@@ -44,6 +53,30 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+    }
+
+    private void getImages() {
+
+        Config config = new Config();
+        config.setToolbarTitleRes(R.string.choose_images);
+
+        /* a lot of other specific changes can be made to the activity layout using the config object
+                visit https://github.com/ParkSangGwon/TedPicker
+        */
+        Intent intent  = new Intent(this, ImagePickerActivity.class);
+        startActivityForResult(intent, INTENT_REQUEST_GET_IMAGES);
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == INTENT_REQUEST_GET_IMAGES && resultCode == Activity.RESULT_OK ) {
+
+            ArrayList<Uri> image_uris = data.getParcelableArrayListExtra(ImagePickerActivity.EXTRA_IMAGE_URIS);
+
+            //do something
+        }
     }
 
     @Override
@@ -91,12 +124,13 @@ public class MainActivity extends AppCompatActivity
             // Handle the camera action
             fragment = new MyMapFragment();
         } else if (id == R.id.nav_gallery) {
-
+            fragment = new ItemFragment();
         } else if (id == R.id.nav_slideshow) {
 
-        } else if (id == R.id.nav_manage) {
+        }/* else if (id == R.id.nav_manage) {
 
-        } else if (id == R.id.nav_share) {
+        }*/
+        else if (id == R.id.nav_share) {
 
         } else if (id == R.id.nav_send) {
 
