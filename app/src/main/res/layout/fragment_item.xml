@@ -1,35 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_height="match_parent"
-    android:layout_width="match_parent">
 
     <android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_margin="10dp"
     android:elevation="5dp"
+    android:layout_marginTop="4dp"
+    android:layout_marginBottom="4dp"
     app:cardCornerRadius="@dimen/cardview_default_radius"
     android:clickable="true"
     android:onClick="goToAlbum(int)"
-        android:id="@+id/textView2">
+    android:id="@+id/linear"
+    >
 
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="5dp"
+    android:background="@color/lightLavender"
+    >
         <TextView
-            android:id="@+id/content"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?attr/textAppearanceListItem"
+            android:id="@+id/txt1"
+            android:layout_width="55dp"
+            android:layout_height="55dp"
             android:text="@string/albumName"
-            android:layout_marginLeft="@dimen/text_margin"
-            android:layout_marginRight="@dimen/text_margin"
-            android:layout_marginBottom="37dp"
-            android:layout_alignBottom="@+id/textView2"
-            android:layout_centerHorizontal="true" />
-
-        <
-
+            android:background="@drawable/circle"
+            android:gravity="center"
+            />
+    <ImageView
+        android:id="@+id/image1"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:src="@drawable/common_google_signin_btn_icon_dark_focused"/>
+    <ImageView
+        android:id="@+id/image2"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:src="@drawable/common_google_signin_btn_icon_dark_focused"/>
+    <ImageView
+        android:id="@+id/image3"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:src="@drawable/common_google_signin_btn_icon_dark_focused"/>
+    <ImageView
+        android:id="@+id/image4"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:src="@drawable/common_google_signin_btn_icon_dark_focused"/>
+    <ImageView
+        android:id="@+id/btn_view_plus"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:src="@android:drawable/ic_input_add"
+        android:background="@color/gray"
+        />
+</LinearLayout>
     </android.support.v7.widget.CardView>
 
 
-</RelativeLayout>

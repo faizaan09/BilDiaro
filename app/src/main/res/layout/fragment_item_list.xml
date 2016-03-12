@@ -6,8 +6,10 @@
     android:name="com.example.jaybhatt.bildiaro.ItemFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginLeft="16dp"
-    android:layout_marginRight="16dp"
+    android:layout_marginLeft="2dp"
+    android:layout_marginRight="2dp"
+    android:layout_marginTop="1dp"
+    android:layout_marginBottom="0dp"
     app:layoutManager="LinearLayoutManager"
     tools:context="com.example.jaybhatt.bildiaro.ItemFragment"
     tools:listitem="@layout/fragment_item" />

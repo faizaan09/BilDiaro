@@ -4,4 +4,9 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
     <color name="black">#000000</color>
+    <color name="lightLavender">#FCE4EC</color>
+    <color name="gray">#EEEEEE</color>
+    <color name="white">#FFFFFF</color>
+    <color name="header_text_color">#000000</color>
+
 </resources>

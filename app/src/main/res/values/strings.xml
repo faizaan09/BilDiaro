@@ -14,4 +14,6 @@
     <string name="caption">Caption</string>
     <string name="albumName">Album Name</string>
     <string name="choose_images">Choose Images</string>
+    <string name="map_geo_search_input_hint">Enter</string>
+    <string name="map_list_header_txt">Map List Header</string>
 </resources>
