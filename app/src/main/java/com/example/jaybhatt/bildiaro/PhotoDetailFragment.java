@@ -69,7 +69,7 @@ public class PhotoDetailFragment extends Fragment {
         String strtext=getArguments().getString("image");
 
         // Inflate the layout for this fragment
-        View view  = inflater.inflate(R.layout.fragment_new, container, false);
+        View view  = inflater.inflate(R.layout.fragment_photo_detail, container, false);
         imgView = (ImageView)view.findViewById(R.id.imageDetail);
         imgView.setImageURI(Uri.parse(strtext));
         return view;
