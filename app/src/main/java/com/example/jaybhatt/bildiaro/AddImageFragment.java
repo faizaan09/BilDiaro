@@ -1,6 +1,9 @@
 package com.example.jaybhatt.bildiaro;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
@@ -12,6 +15,11 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.Toast;
+
+import com.orm.SugarContext;
+
+import java.io.File;
+import java.io.IOException;
 
 
 /**
@@ -38,6 +46,7 @@ public class AddImageFragment extends Fragment {
 
 
     private OnFragmentInteractionListener mListener;
+    private ImageView image;
 
     public AddImageFragment() {
         // Required empty public constructor
@@ -76,41 +85,70 @@ public class AddImageFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view =  inflater.inflate(R.layout.fragment_add_image, container, false);
-        geo_autocomplete_clear = (ImageView) view.findViewById(R.id.geo_autocomplete_clear);
-
-        geo_autocomplete = (DelayAutoCompleteTextView) view.findViewById(R.id.geo_autocomplete);
-        geo_autocomplete.setThreshold(THRESHOLD);
-        geo_autocomplete.setAdapter(new GeoAutoCompleteAdapter(getActivity())); // 'this' is Activity instance
-
-        geo_autocomplete.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                GeoSearchResult result = (GeoSearchResult) adapterView.getItemAtPosition(position);
-                geo_autocomplete.setText(result.getAddress());
-                Toast.makeText(getActivity(), result.getLatLng().latitude +" "+ result.getLatLng().longitude, Toast.LENGTH_LONG).show();
+        image = (ImageView) view.findViewById(R.id.img_new);
+        String imageUri = getArguments().getString("IMAGE_URI");
+        File imgFile = new  File(imageUri);
+        long loc_lat=0,loc_long=0;
+        if(imgFile.exists()) {
+            String latLong = new String();
+            try {
+                ExifInterface exifInterface = new ExifInterface(imageUri);
+                loc_lat = Long.parseLong(exifInterface.getAttribute(ExifInterface.TAG_GPS_LATITUDE));
+                loc_long = Long.parseLong(exifInterface.getAttribute(ExifInterface.TAG_GPS_LONGITUDE));
+                if (exifInterface.getAttribute(ExifInterface.TAG_GPS_LATITUDE_REF).equalsIgnoreCase("N"))
+                    loc_lat *= -1;
+                if (exifInterface.getAttribute(ExifInterface.TAG_GPS_LONGITUDE_REF).equalsIgnoreCase("W"))
+                    loc_long *= -1;
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        });
+            Photo photo = new Photo("", null, imageUri, loc_long, loc_lat, null);
+            photo.save();
 
-        geo_autocomplete.addTextChangedListener(new TextWatcher() {
+            Bitmap myBitmap = BitmapFactory.decodeFile(new File(photo.getFilePath()).getAbsolutePath());
+            image.setImageBitmap(myBitmap);
 
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
 
-            }
+        }
 
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
 
-            @Override
-            public void afterTextChanged(Editable s) {
-                if (s.length() > 0) {
-                    geo_autocomplete_clear.setVisibility(View.VISIBLE);
-                } else {
-                    geo_autocomplete_clear.setVisibility(View.GONE);
+
+            geo_autocomplete_clear = (ImageView) view.findViewById(R.id.geo_autocomplete_clear);
+
+            geo_autocomplete = (DelayAutoCompleteTextView) view.findViewById(R.id.geo_autocomplete);
+            geo_autocomplete.setThreshold(THRESHOLD);
+            geo_autocomplete.setAdapter(new GeoAutoCompleteAdapter(getActivity())); // 'this' is Activity instance
+
+            geo_autocomplete.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                    GeoSearchResult result = (GeoSearchResult) adapterView.getItemAtPosition(position);
+                    geo_autocomplete.setText(result.getAddress());
+                    Toast.makeText(getActivity(), result.getLatLng().latitude + " " + result.getLatLng().longitude, Toast.LENGTH_LONG).show();
                 }
-            }
-        });
+            });
+
+            geo_autocomplete.addTextChangedListener(new TextWatcher() {
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                }
+
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    if (s.length() > 0) {
+                        geo_autocomplete_clear.setVisibility(View.VISIBLE);
+                    } else {
+                        geo_autocomplete_clear.setVisibility(View.GONE);
+                    }
+                }
+            });
+
 
         geo_autocomplete_clear.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -120,6 +158,13 @@ public class AddImageFragment extends Fragment {
             }
         });
         return view;
+    }
+
+
+
+    public void onSave(View view)
+    {
+
     }
 
     // TODO: Rename method, update argument and hook method into UI event

@@ -3,6 +3,7 @@ package com.example.jaybhatt.bildiaro;
 /**
  * Created by Jay Bhatt on 04-03-2016.
  */
+import com.orm.SugarRecord;
 import com.orm.dsl.Ignore;
 import com.orm.dsl.Table;
 
@@ -11,8 +12,7 @@ import java.util.Date;
 /**
  * Created by Faizaan on 2/18/2016.
  */
-@Table
-public class Photo {
+public class Photo extends SugarRecord {
     @Ignore
     private static Long idCount = 0L;
     private Long id;

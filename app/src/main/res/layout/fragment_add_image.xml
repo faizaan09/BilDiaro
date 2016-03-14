@@ -1,13 +1,15 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     tools:context="com.example.jaybhatt.bildiaro.AddImageFragment">
-
+<RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
     <com.example.jaybhatt.bildiaro.DelayAutoCompleteTextView
         android:id="@+id/geo_autocomplete"
         android:layout_width="match_parent"
-        android:layout_height="fill_parent"
+        android:layout_height="wrap_content"
         android:imeOptions="flagNoExtractUi|actionSearch"
         android:inputType="textCapSentences"
         android:textColor="@color/header_text_color"
@@ -29,8 +31,17 @@
         android:src="@android:drawable/ic_delete"
         android:contentDescription="@string/map_list_header_txt"
         android:layout_gravity="center_vertical|end"
-        android:visibility="gone"
+        android:layout_marginTop="7dp"
         android:layout_marginEnd="12dp"
         android:layout_marginRight="12dp"
+        android:layout_alignRight="@id/geo_autocomplete"
         />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/geo_autocomplete"
+        android:id="@+id/img_new"
+        />
+</RelativeLayout>
 </FrameLayout>

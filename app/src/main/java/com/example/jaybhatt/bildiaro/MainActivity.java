@@ -19,6 +19,7 @@ import android.view.MenuItem;
 
 import com.gun0912.tedpicker.Config;
 import com.gun0912.tedpicker.ImagePickerActivity;
+import com.orm.SugarContext;
 
 import java.util.ArrayList;
 
@@ -34,7 +35,7 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
+        SugarContext.init(this);
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -59,7 +60,7 @@ public class MainActivity extends AppCompatActivity
 
         Config config = new Config();
         config.setToolbarTitleRes(R.string.choose_images);
-
+        config.setSelectionLimit(1);
         /* a lot of other specific changes can be made to the activity layout using the config object
                 visit https://github.com/ParkSangGwon/TedPicker
         */
@@ -74,7 +75,14 @@ public class MainActivity extends AppCompatActivity
         if (requestCode == INTENT_REQUEST_GET_IMAGES && resultCode == Activity.RESULT_OK ) {
 
             ArrayList<Uri> image_uris = data.getParcelableArrayListExtra(ImagePickerActivity.EXTRA_IMAGE_URIS);
-
+            Fragment fragment = new AddImageFragment();
+            Bundle bundle = new Bundle();
+            bundle.putString("IMAGE_URI",image_uris.get(0).toString());
+            fragment.setArguments(bundle);
+            this.getFragmentManager().beginTransaction()
+                    .replace(R.id.frame_container, fragment, null)
+                    .addToBackStack(null)
+                    .commit();
             //do something
         }
     }
